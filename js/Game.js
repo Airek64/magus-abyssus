@@ -65,9 +65,7 @@ BasicGame.Game.prototype = {
         this.groundTiles.addMultiple(BasicGame.levelGenerator.groundTiles);
         
         
-        for (var i = 0; i < this.enemies.length; i++){
-            this.enemies[i].sprite.bringToTop();
-        }
+        
         for (var i = 0; i < this.food.length; i++){
             this.food[i].bringToTop();
         }
@@ -75,11 +73,13 @@ BasicGame.Game.prototype = {
         this.portal.bringToTop();
         BasicGame.player.sprite.bringToTop();
         
+        for (var i = 0; i < this.enemies.length; i++){
+            this.enemies[i].sprite.bringToTop();
+        }
+        
         this.healthbar = this.add.graphics();
-        //this.healthbar.lineStyle(2, 0x00FF00, 1);
         this.healthbar.beginFill(0xFF0000);
         this.healthbar.drawRect(this.camera.x, this.camera.y, BasicGame.player.health * 5, 16);
-        //this.healthbar.lineColor = '#0fffff';
         this.healthbar.cameraOffset.setTo(100, 100);
         this.healthbar.fixedToCamera = true;
         

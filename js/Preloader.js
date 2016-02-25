@@ -12,7 +12,7 @@ BasicGame.Preloader.prototype = {
 
 	preload: function () {
 
-        
+        this.load.image('title', 'assets/Title.png');
 		this.load.image('player', 'assets/character-sketch.png');
         this.load.image('ground', 'assets/GroundTile.png');
         this.load.image('wall', 'assets/WallTile.png');

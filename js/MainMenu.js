@@ -2,6 +2,7 @@
 BasicGame.MainMenu = function (game) {
 
     this.style = null;
+    this.style2 = null;
     this.text = null;
     this.text2 = null;
     this.fullSceenToggle = null;
@@ -12,12 +13,15 @@ BasicGame.MainMenu.prototype = {
 
 	create: function () {
 
+        this.add.sprite(60, 100, 'title');
+        
         this.style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+        this.style2 = { font: "bold 16px Arial", fill: "#877", boundsAlignH: "center", boundsAlignV: "middle" };
 
-        this.text = this.game.add.text(150, 0, "Press Enter to Start", this.style);
+        this.text = this.game.add.text(130, 350, "Press Enter to Start", this.style);
         this.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
         
-        this.text2 = this.game.add.text(0,700, "Press F to toggle Full Screen", this.style);
+        this.text2 = this.game.add.text(0,700, "Press F to toggle Full Screen", this.style2);
         this.text2.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
         
         this.text.setTextBounds(0, 100, 800, 100);
