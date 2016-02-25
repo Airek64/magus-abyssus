@@ -100,6 +100,8 @@ BasicGame.Game.prototype = {
             this.move();
             this.eatFood(playerX + 64, playerY);
             this.moveTimer = this.game.time.now + 200;
+            BasicGame.player.facing = 0;
+            BasicGame.player.sprite.frame = 0;
 
         }
         else if (this.cursors.left.isDown && this.moveTimer < this.game.time.now){
@@ -109,6 +111,8 @@ BasicGame.Game.prototype = {
             this.move();
             this.eatFood(playerX - 64, playerY);
             this.moveTimer = this.game.time.now + 200;
+            BasicGame.player.facing = 3;
+            BasicGame.player.sprite.frame = 3;
             
         }
         else if (this.cursors.up.isDown && this.moveTimer < this.game.time.now){
@@ -276,10 +280,15 @@ BasicGame.Game.prototype = {
     attackEnemies: function(x,y){
         for (var i = 0; i < this.enemies.length; i++){
             if (this.enemies[i].sprite.x == x && this.enemies[i].sprite.y == y && this.enemies[i].sprite.alive){
-                //BasicGame.player.health -= this.enemies[i].getDamage();
+                if (BasicGame.player.facing == 0){
+                    BasicGame.player.sprite.animations.play('attack-right');
+                }
+                else {
+                    BasicGame.player.sprite.animations.play('attack-left');
+                }
                 this.enemies[i].health -= BasicGame.player.getDamage();
                 
-                //BasicGame.player.hurtSound.play();
+
                 
                 if (this.enemies[i].health <= 0){
                     BasicGame.player.gainExperience(10);

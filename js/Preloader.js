@@ -13,7 +13,7 @@ BasicGame.Preloader.prototype = {
 	preload: function () {
 
         this.load.image('title', 'assets/Title.png');
-		this.load.image('player', 'assets/character-sketch.png');
+		//this.load.image('player', 'assets/character-sketch.png');
         this.load.image('ground', 'assets/GroundTile.png');
         this.load.image('wall', 'assets/WallTile.png');
         this.load.image('portal', 'assets/vortex.png');
@@ -21,6 +21,7 @@ BasicGame.Preloader.prototype = {
         this.load.image('rat', 'assets/Rat.png');
         this.load.audio('hurt', 'assets/Hit_Hurt.ogg');
         this.load.audio('teleport', 'assets/Teleport.ogg');
+        this.load.spritesheet('player', 'assets/Mage.png', 62, 80);
 	},
 
 	create: function () {
