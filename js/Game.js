@@ -150,7 +150,7 @@ BasicGame.Game.prototype = {
 
     quitGame: function () {
         BasicGame.player.health = 100;
-        BasicGame.player.hunger = 100;
+        BasicGame.player.hunger = 200;
         BasicGame.player.xp = 0;
         BasicGame.player.level = 1;
         this.state.start('MainMenu');
@@ -181,22 +181,26 @@ BasicGame.Game.prototype = {
     
     move: function() {
         
+        this.moveEnemies();
+        
         BasicGame.player.hunger -= 1;
         
-        if (BasicGame.player.hunger > 97){
-            BasicGame.player.health += 5;
+        if (BasicGame.player.hunger > 198){
+            BasicGame.player.health += 10;
         }
-        else if (BasicGame.player.hunger > 90) {
+        else if (BasicGame.player.hunger > 185) {
             BasicGame.player.health += 1;
         }
-        else if (BasicGame.player.hunger < 60) {
+        else if (BasicGame.player.hunger > 100) {
             
         }
-        else if (BasicGame.player.hunger < 30) {
-            BasicGame.player.health -= 1;
+        else if (BasicGame.player.hunger > 50) {
+            if (BasicGame.player.health > 30){
+                BasicGame.player.health -= 1;
+            }
         }
-        else if (BasicGame.player.hunger < 10) {
-            BasicGame.player.health -= 5;
+        else {
+            BasicGame.player.health -= 1;
         }
         
         if (BasicGame.player.health > 100){
@@ -205,13 +209,77 @@ BasicGame.Game.prototype = {
         
     },
     
+    moveEnemies: function() {
+         for (var i = 0; i < this.enemies.length; i++){
+            var enemy = this.enemies[i];
+            var enemyX = enemy.sprite.x;
+            var enemyY = enemy.sprite.y;
+            for (var x = enemyX - (4 * 64); x < enemyX + (4 * 64); x+= 64){
+                for (var y = enemyY - (4 * 64); y < enemyY + (4 * 64); y+= 64){
+                    if (BasicGame.player.sprite.x == x && BasicGame.player.sprite.y == y){
+                        var diffX = BasicGame.player.sprite.x - enemy.sprite.x;
+                        var diffY = BasicGame.player.sprite.y - enemy.sprite.y;
+                        
+                        //if (Math.abs(diffX) > Math.abs(diffY)){
+                            if (diffX > 0){
+                                this.groundTiles.forEach(this.moveEnemy, this, true, enemyX + 64, enemyY, enemy)
+                                if (enemy.sprite.x + 64 == BasicGame.player.sprite.x && enemy.sprite.y == BasicGame.player.sprite.y ){
+                                    this.attackPlayer(enemy);
+                                }
+                            }
+                            else if (diffX < 0){
+                                this.groundTiles.forEach(this.moveEnemy, this, true, enemyX - 64, enemyY, enemy)
+                                if (enemy.sprite.x - 64 == BasicGame.player.sprite.x && enemy.sprite.y == BasicGame.player.sprite.y )  {
+                                    this.attackPlayer(enemy);
+                                }
+                            }
+                        //}
+                        //else {
+                            if (diffY > 0){
+                                this.groundTiles.forEach(this.moveEnemy, this, true, enemy.sprite.x, enemyY + 64, enemy)
+                                if (enemy.sprite.x == BasicGame.player.sprite.x && enemy.sprite.y + 64 == BasicGame.player.sprite.y )  {
+                                    this.attackPlayer(enemy);
+                                }
+                            }
+                            else if (diffY < 0){
+                                this.groundTiles.forEach(this.moveEnemy, this, true, enemy.sprite.x, enemyY - 64, enemy)
+                                if (enemy.sprite.x == BasicGame.player.sprite.x && enemy.sprite.y - 64 == BasicGame.player.sprite.y )  {
+                                    this.attackPlayer(enemy);
+                                }
+                            }
+                        //}
+                    } // comparison
+            
+                } //y loop      
+            } //x loop
+         }//outer loop
+    }, 
+    
+    moveEnemy: function(tile, enemyX, enemyY, enemy) {
+        var canMove = true;
+        //var isPlayer = false;
+        for (var i = 0; i < this.enemies.length; i++){
+            if (this.enemies[i].sprite.x == enemyX && this.enemies[i].sprite.y == enemyY){
+                canMove = false;
+            }
+        }
+        if (enemyX == BasicGame.player.sprite.x && enemyY == BasicGame.player.sprite.y ){
+            canMove = false;
+        }
+        if (tile.x == enemyX && tile.y == enemyY && canMove){
+            enemy.sprite.x = tile.x;
+            enemy.sprite.y = tile.y;
+        }
+        
+    },
+    
     attackEnemies: function(x,y){
         for (var i = 0; i < this.enemies.length; i++){
             if (this.enemies[i].sprite.x == x && this.enemies[i].sprite.y == y && this.enemies[i].sprite.alive){
-                BasicGame.player.health -= this.enemies[i].getDamage();
+                //BasicGame.player.health -= this.enemies[i].getDamage();
                 this.enemies[i].health -= BasicGame.player.getDamage();
                 
-                BasicGame.player.hurtSound.play();
+                //BasicGame.player.hurtSound.play();
                 
                 if (this.enemies[i].health <= 0){
                     BasicGame.player.gainExperience(10);
@@ -223,11 +291,18 @@ BasicGame.Game.prototype = {
         return true;
     },
     
+    attackPlayer: function(enemy){
+        if (enemy.sprite.alive){
+            BasicGame.player.health -= enemy.getDamage();
+            BasicGame.player.hurtSound.play();
+        }
+    },
+    
     eatFood: function(x,y){
         for (var i = 0; i < this.food.length; i++){
             if (this.food[i].x == x && this.food[i].y == y && this.food[i].alive){
                 this.food[i].kill();
-                BasicGame.player.hunger = 100;
+                BasicGame.player.hunger = 200;
             } 
         
         }

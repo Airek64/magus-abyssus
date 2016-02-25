@@ -2,7 +2,7 @@ BasicGame.Player = function(game) {
     
     this.game = game;
     this.health = 100;
-    this.hunger = 100;
+    this.hunger = 200;
     this.maxDamageMult = null;
     this.minDamageMult = null;
     this.level = 1;
