@@ -1,11 +1,12 @@
 BasicGame.Player = function(game) {
     
     this.game = game;
-    this.health = null;
+    this.health = 100;
+    this.hunger = 100;
     this.maxDamageMult = null;
     this.minDamageMult = null;
-    this.level = null;
-    this.xp = null;
+    this.level = 1;
+    this.xp = 0;
     this.sprite = null;
     this.cursors;
     this.hurtSound;
@@ -22,12 +23,13 @@ BasicGame.Player.prototype = {
         this.sprite.anchor.set(0.5,0.6);
         //this.sprite.body.setSize(62, 80);
         
-        this.health = 100;
-        this.maxDamageMult = 6;
+        //this.health = 100;
+        this.maxDamageMult = 5;
         this.minDamageMult = 3;
-        this.level = 1;
-        this.xp = 0;
+//        this.level = 1;
+//        this.xp = 0;
         
+        this.hurtSound = this.game.add.audio('hurt');
 //        this.hurtSound = this.game.add.audio('hurt');
 
         

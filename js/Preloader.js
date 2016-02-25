@@ -17,7 +17,10 @@ BasicGame.Preloader.prototype = {
         this.load.image('ground', 'assets/GroundTile.png');
         this.load.image('wall', 'assets/WallTile.png');
         this.load.image('portal', 'assets/vortex.png');
+        this.load.image('food', 'assets/Apple.png');
         this.load.image('rat', 'assets/Rat.png');
+        this.load.audio('hurt', 'assets/Hit_Hurt.ogg');
+        this.load.audio('teleport', 'assets/Teleport.ogg');
 	},
 
 	create: function () {

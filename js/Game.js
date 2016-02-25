@@ -26,6 +26,9 @@ BasicGame.Game = function (game) {
     this.moveTimer = null;
     this.portal = null;
     this.enemies = null;
+    this.healthbar = null;
+    this.quitButton = null;
+    this.teleportSound = null;
 };
 
 BasicGame.Game.prototype = {
@@ -36,6 +39,11 @@ BasicGame.Game.prototype = {
 
         this.fullScreenToggle = this.input.keyboard.addKey(Phaser.Keyboard.F);
         this.fullScreenToggle.onUp.add(this.goFull, this);
+        
+        this.quitButton = this.input.keyboard.addKey(Phaser.Keyboard.Q);
+        this.quitButton.onUp.add(this.quitGame, this);
+        
+        this.teleportSound = this.add.audio('teleport');
 
         BasicGame.levelGenerator.generate();
         
@@ -51,12 +59,22 @@ BasicGame.Game.prototype = {
         this.groundTiles = this.add.group();
         this.groundTiles.addMultiple(BasicGame.levelGenerator.groundTiles);
         
+        
+        
         for (var i = 0; i < this.enemies.length; i++){
             this.enemies[i].sprite.bringToTop();
         }
         
         this.portal.bringToTop();
         BasicGame.player.sprite.bringToTop();
+        
+        this.healthbar = this.add.graphics();
+        //this.healthbar.lineStyle(2, 0x00FF00, 1);
+        this.healthbar.beginFill(0xFF0000);
+        this.healthbar.drawRect(this.camera.x, this.camera.y, BasicGame.player.health * 5, 16);
+        //this.healthbar.lineColor = '#0fffff';
+        this.healthbar.cameraOffset.setTo(100, 100);
+        this.healthbar.fixedToCamera = true;
         
         this.cursors = this.game.input.keyboard.createCursorKeys();
         
@@ -68,31 +86,62 @@ BasicGame.Game.prototype = {
         var playerX = BasicGame.player.sprite.x;
         var playerY = BasicGame.player.sprite.y;
 
-        if (this.cursors.right.isDown && this.moveTimer < this.game.time.now && this.attackEnemies(playerX + 64, playerY)){
+        if (this.cursors.right.isDown && this.moveTimer < this.game.time.now){
+            if ( this.attackEnemies(playerX + 64, playerY)){
+                this.groundTiles.forEach(this.movePlayer, this, true, playerX + 64, playerY);
+            }
+            this.move();
+            this.moveTimer = this.game.time.now + 200;
+
+        }
+        else if (this.cursors.left.isDown && this.moveTimer < this.game.time.now){
+            if (this.attackEnemies(playerX - 64, playerY)) {
+                this.groundTiles.forEach(this.movePlayer, this, true, playerX - 64, playerY);
+            }
+            this.move();
+            this.moveTimer = this.game.time.now + 200;
             
-            this.groundTiles.forEach(this.movePlayer, this, true, playerX + 64, playerY);
-            this.moveTimer = this.game.time.now + 200;
         }
-        else if (this.cursors.left.isDown && this.moveTimer < this.game.time.now && this.attackEnemies(playerX - 64, playerY)){
-            this.groundTiles.forEach(this.movePlayer, this, true, playerX - 64, playerY);
+        else if (this.cursors.up.isDown && this.moveTimer < this.game.time.now){
+            if (this.attackEnemies(playerX, playerY - 64)){
+                this.groundTiles.forEach(this.movePlayer, this, true, playerX, playerY - 64);
+            }
+            this.move();
             this.moveTimer = this.game.time.now + 200;
+            
         }
-        else if (this.cursors.up.isDown && this.moveTimer < this.game.time.now && this.attackEnemies(playerX, playerY - 64)){
-            this.groundTiles.forEach(this.movePlayer, this, true, playerX, playerY - 64);
-            this.moveTimer = this.game.time.now + 200;
-        }
-        else if (this.cursors.down.isDown && this.moveTimer < this.game.time.now && this.attackEnemies(playerX, playerY + 64)){
-            this.groundTiles.forEach(this.movePlayer, this, true, playerX, playerY + 64);
+        else if (this.cursors.down.isDown && this.moveTimer < this.game.time.now){
+            if (this.attackEnemies(playerX, playerY + 64)) {
+                this.groundTiles.forEach(this.movePlayer, this, true, playerX, playerY + 64);
+            }        
+            this.move();
             this.moveTimer = this.game.time.now + 200;
         }
 
+        
+        
+        
+        //update healthbar
+        this.healthbar.width = BasicGame.player.health * 5;
+       
+        
+        
+        
+        if (BasicGame.player.health <= 0){
+            this.quitGame()
+        }
+        
         if (BasicGame.player.sprite.x == this.portal.x && BasicGame.player.sprite.y == this.portal.y){
+            this.teleportSound.play();
             this.state.start('Game');
         }
     },
 
-    quitGame: function (pointer) {
-
+    quitGame: function () {
+        BasicGame.player.health = 100;
+        BasicGame.player.hunger = 100;
+        BasicGame.player.xp = 0;
+        BasicGame.player.level = 1;
         this.state.start('MainMenu');
 
     },
@@ -115,13 +164,34 @@ BasicGame.Game.prototype = {
             BasicGame.player.sprite.x = tile.x;
             BasicGame.player.sprite.y = tile.y;
         }
+        
+        
+    },
+    
+    move: function() {
+        
+        BasicGame.player.hunger -= 1;
+        
+        if (BasicGame.player.hunger > 95){
+            BasicGame.player.health += 5;
+        }
+        else if (BasicGame.player.hunger > 85) {
+            BasicGame.player.health += 1;
+        }
+        
+        if (BasicGame.player.health > 100){
+            BasicGame.player.health = 100;
+        }
     },
     
     attackEnemies: function(x,y){
         for (var i = 0; i < this.enemies.length; i++){
-            if (this.enemies[i].sprite.x == x && this.enemies[i].sprite.y == y && this.enemies[i].sprite.isAlive){
+            if (this.enemies[i].sprite.x == x && this.enemies[i].sprite.y == y && this.enemies[i].sprite.alive){
                 BasicGame.player.health -= this.enemies[i].getDamage();
-                this.enemies[i].health -= BasicGame.getDamage();
+                this.enemies[i].health -= BasicGame.player.getDamage();
+                
+                BasicGame.player.hurtSound.play();
+                
                 if (this.enemies[i].health <= 0){
                     BasicGame.player.gainExperience(10);
                     this.enemies[i].sprite.kill();

@@ -20,8 +20,8 @@ BasicGame.Rat.prototype = {
         //this.sprite.body.setSize(62, 80);
         
         this.health = 50;
-        this.maxDamageMult = 5;
-        this.minDamageMult = 2;
+        this.maxDamageMult = 3;
+        this.minDamageMult = 1;
         
 //        this.hurtSound = this.game.add.audio('hurt');
 
