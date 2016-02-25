@@ -30,11 +30,16 @@ BasicGame.Game = function (game) {
     this.quitButton = null;
     this.teleportSound = null;
     this.food = null;
+    this.floor = 1;
+    this.style = null;
+    this.text = null;
 };
 
 BasicGame.Game.prototype = {
 
     create: function () {
+        
+        
 
         this.world.resize(4096, 4096);
 
@@ -84,6 +89,11 @@ BasicGame.Game.prototype = {
         this.healthbar.fixedToCamera = true;
         
         this.cursors = this.game.input.keyboard.createCursorKeys();
+        
+        this.style = { font: "bold 16px Arial", fill: "#999", boundsAlignH: "center", boundsAlignV: "middle" };
+
+        this.text = this.game.add.text(5, 20, "Floor: " + this.floor, this.style);
+        this.text.fixedToCamera = true;
         
     },
 
@@ -148,6 +158,8 @@ BasicGame.Game.prototype = {
         
         if (BasicGame.player.sprite.x == this.portal.x && BasicGame.player.sprite.y == this.portal.y){
             this.teleportSound.play();
+            this.floor += 1;
+          
             this.state.start('Game');
         }
     },
@@ -156,6 +168,7 @@ BasicGame.Game.prototype = {
         BasicGame.player.health = 100;
         BasicGame.player.hunger = 200;
         BasicGame.player.xp = 0;
+        this.floor = 1;
         BasicGame.player.level = 1;
         this.state.start('MainMenu');
 
