@@ -7,6 +7,7 @@ BasicGame.LevelGenerator = function(game) {
     this.startingTile = null;
     this.exitTile = null;
     this.enemies = [];
+    this.food = [];
 }
 
 BasicGame.LevelGenerator.prototype = {
@@ -15,6 +16,7 @@ BasicGame.LevelGenerator.prototype = {
         this.groundTiles = this.game.add.group();
         this.wallTiles = this.game.add.group();
         this.room = this.game.add.group();
+        //this.food = this.game.add.group();
         
         for (var i = 0; i < this.game.rnd.integerInRange(4,8); i++){
             var room = new BasicGame.Room(this.game);
@@ -70,6 +72,16 @@ BasicGame.LevelGenerator.prototype = {
             this.enemies[i].add(tile.x,tile.y);
         }
         return this.enemies;
+    },
+    
+    placeFood: function() {
+        for (var i = 0; i < 2; i++){
+            var tile = this.groundTiles.getChildAt(this.game.rnd.integerInRange(0,this.groundTiles.length - 1));
+            this.food[i] = this.game.add.sprite(tile.x, tile.y, 'food');
+            this.food[i].anchor.set(0.5,0.5);
+            
+        }
+        return this.food;
     },
     
     drawPassage: function(room1, room2){

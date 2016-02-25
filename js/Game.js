@@ -29,6 +29,7 @@ BasicGame.Game = function (game) {
     this.healthbar = null;
     this.quitButton = null;
     this.teleportSound = null;
+    this.food = null;
 };
 
 BasicGame.Game.prototype = {
@@ -55,14 +56,20 @@ BasicGame.Game.prototype = {
         BasicGame.levelGenerator.placePlayer(BasicGame.player);
         
         this.enemies = BasicGame.levelGenerator.placeEnemies();
+        this.food = BasicGame.levelGenerator.placeFood();
+        
+        ;
+       
         
         this.groundTiles = this.add.group();
         this.groundTiles.addMultiple(BasicGame.levelGenerator.groundTiles);
         
         
-        
         for (var i = 0; i < this.enemies.length; i++){
             this.enemies[i].sprite.bringToTop();
+        }
+        for (var i = 0; i < this.food.length; i++){
+            this.food[i].bringToTop();
         }
         
         this.portal.bringToTop();
@@ -91,6 +98,7 @@ BasicGame.Game.prototype = {
                 this.groundTiles.forEach(this.movePlayer, this, true, playerX + 64, playerY);
             }
             this.move();
+            this.eatFood(playerX + 64, playerY);
             this.moveTimer = this.game.time.now + 200;
 
         }
@@ -99,6 +107,7 @@ BasicGame.Game.prototype = {
                 this.groundTiles.forEach(this.movePlayer, this, true, playerX - 64, playerY);
             }
             this.move();
+            this.eatFood(playerX - 64, playerY);
             this.moveTimer = this.game.time.now + 200;
             
         }
@@ -107,6 +116,7 @@ BasicGame.Game.prototype = {
                 this.groundTiles.forEach(this.movePlayer, this, true, playerX, playerY - 64);
             }
             this.move();
+            this.eatFood(playerX, playerY - 64);
             this.moveTimer = this.game.time.now + 200;
             
         }
@@ -115,6 +125,7 @@ BasicGame.Game.prototype = {
                 this.groundTiles.forEach(this.movePlayer, this, true, playerX, playerY + 64);
             }        
             this.move();
+            this.eatFood(playerX, playerY + 64);
             this.moveTimer = this.game.time.now + 200;
         }
 
@@ -172,16 +183,26 @@ BasicGame.Game.prototype = {
         
         BasicGame.player.hunger -= 1;
         
-        if (BasicGame.player.hunger > 95){
+        if (BasicGame.player.hunger > 97){
             BasicGame.player.health += 5;
         }
-        else if (BasicGame.player.hunger > 85) {
+        else if (BasicGame.player.hunger > 90) {
             BasicGame.player.health += 1;
+        }
+        else if (BasicGame.player.hunger < 60) {
+            
+        }
+        else if (BasicGame.player.hunger < 30) {
+            BasicGame.player.health -= 1;
+        }
+        else if (BasicGame.player.hunger < 10) {
+            BasicGame.player.health -= 5;
         }
         
         if (BasicGame.player.health > 100){
             BasicGame.player.health = 100;
         }
+        
     },
     
     attackEnemies: function(x,y){
@@ -200,6 +221,16 @@ BasicGame.Game.prototype = {
             } 
         }
         return true;
+    },
+    
+    eatFood: function(x,y){
+        for (var i = 0; i < this.food.length; i++){
+            if (this.food[i].x == x && this.food[i].y == y && this.food[i].alive){
+                this.food[i].kill();
+                BasicGame.player.hunger = 100;
+            } 
+        
+        }
     }
 
 };
